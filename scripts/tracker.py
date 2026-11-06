@@ -21,6 +21,7 @@ as NOT APPLIED: Redmine answers 204 and silently keeps the old status.
 """
 import argparse
 import concurrent.futures
+import functools
 import json
 import os
 import subprocess
@@ -41,7 +42,9 @@ CF = {2: "Backport", 16: "Release", 21: "Pull request ID", 33: "Merge commit",
       34: "Fixed In", 35: "Released In"}
 
 
-def key(required=True):
+@functools.lru_cache(maxsize=None)
+def _lookup_key():
+    """The API key from the environment or the macOS keychain, read once per run."""
     k = os.environ.get("REDMINE_API_KEY")
     if k:
         return k
@@ -51,9 +54,14 @@ def key(required=True):
             ["security", "find-generic-password", "-s", "tracker.ceph.com",
              "-a", acct, "-w"], text=True, stderr=subprocess.DEVNULL).strip()
     except (subprocess.CalledProcessError, FileNotFoundError):
-        if required:
-            sys.exit("no API key: set REDMINE_API_KEY or add the keychain item")
         return None
+
+
+def key(required=True):
+    k = _lookup_key()
+    if k is None and required:
+        sys.exit("no API key: set REDMINE_API_KEY or add the keychain item")
+    return k
 
 
 def call(path, method="GET", body=None, auth=False):
