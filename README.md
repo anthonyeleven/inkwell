@@ -32,6 +32,14 @@ It needs Python 3, Git, a `ceph/ceph` clone with your fork as `origin`, the
 GitHub CLI authenticated to github.com, and a tracker.ceph.com API key for
 tracker writes. The setup table in `SKILL.md` has the details.
 
+## See also
+
+[inkling](https://github.com/anthonyeleven/claude-inkling) is a Claude Code
+status line. It shows what a session has cost so far, how full its context is,
+and your spend for the month, plus where the month will end at the current
+pace. A long triage or backport run can get big, and inkling shows when it's
+time for `/compact` or `/clear`.
+
 ## License
 
 Apache 2.0. See `LICENSE.txt`.
